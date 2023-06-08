@@ -1,0 +1,85 @@
+import org.junit.Assert;
+import org.junit.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.*;
+import java.time.Duration;
+import java.util.NoSuchElementException;
+
+import static java.lang.Thread.sleep;
+
+public class Homework {
+    @Test
+
+    public void logIn() throws InterruptedException {
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://www.saucedemo.com/");
+
+        Assert.assertEquals("Swag Labs",driver.getTitle());
+        By username = By.id("user-name");
+        By password = By.name("password");
+        driver.findElement(username).sendKeys("standard_user");
+        driver.findElement(password).sendKeys("secret_sauce");
+
+        Wait<WebDriver> waitForLogin = new FluentWait<>(driver).withTimeout(Duration.ofSeconds(10))
+                .pollingEvery(Duration.ofMillis(500))
+                .ignoring(NoSuchElementException.class);
+
+        waitForLogin.until(ExpectedConditions.elementToBeClickable(By.name("login-button"))).click();
+
+
+        driver.findElement(By.xpath("//*[@id=\"add-to-cart-sauce-labs-backpack\"]")).click();
+        driver.findElement(By.id("add-to-cart-test.allthethings()-t-shirt-(red)")).click();
+        String expectedResult = "Sauce Labs Backpack";
+        String actualResult = driver.findElement(By.xpath("//*[@id=\"item_4_title_link\"]/div")).getText();
+        Assert.assertEquals(expectedResult,actualResult);
+
+
+        driver.findElement(By.className("shopping_cart_link")).click();
+        driver.findElement(By.id("checkout")).click();
+
+        driver.findElement(By.xpath("//*[@id=\"first-name\"]")).sendKeys("Dodi");
+        driver.findElement(By.name("lastName")).sendKeys("Kvinikadze");
+        driver.findElement(By.id("postal-code")).sendKeys("91208");
+
+
+
+        driver.findElement(By.xpath("//*[@id=\"continue\"]")).click();
+        String expectedTotalAmount = "Total: $49.66";
+        String actualTotalAmount = driver.findElement(By.xpath("//*[@id=\"checkout_summary_container\"]/div/div[2]/div[8]"))
+                .getText();
+        Assert.assertEquals(expectedTotalAmount,actualTotalAmount);
+        WebElement finishButton = driver.findElement(By.id("finish"));
+        finishButton.click();
+
+        WebElement backHomeButton = driver.findElement(By.xpath("//*[@id=\"back-to-products\"]"));
+        backHomeButton.click();
+
+        By dropDown =(By.xpath("//*[@id=\"header_container\"]/div[2]/div/span/select"));
+        driver.findElement(dropDown).click();
+        Select selectOptions = new Select(driver.findElement(dropDown));
+        int dropDownSize = selectOptions.getOptions().size();
+
+        for (int i =0; i < dropDownSize; i++) {
+          selectOptions = new Select(driver.findElement(By.xpath("//*[@id=\"header_container\"]/div[2]/div/span/select")));
+          selectOptions.selectByIndex(i);
+            Thread.sleep(5000);
+
+        }
+
+        driver.findElement(By.id("react-burger-menu-btn")).click();
+        Thread.sleep(5000);
+
+        WebElement logOut = driver.findElement(By.id("logout_sidebar_link"));
+        logOut.click();
+        sleep(3000);
+        driver.quit();
+
+
+    }
+
+
+}
